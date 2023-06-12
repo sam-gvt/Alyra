@@ -45,7 +45,7 @@ contract Voting is Ownable {
     }
 
 
-    function nextWorkflowStatus() public onlyOwner {
+    function nextWorkflowStatus() public external onlyOwner {
         require(uint8(stateWorkflowStatus) + 1 < 6, "End session !");
         uint8 nextState = uint8(stateWorkflowStatus) + 1;
 
@@ -54,24 +54,24 @@ contract Voting is Ownable {
     }
 
 
-    function RegisteringVoters(address _address) public onlyOwner {
+    function RegisteringVoters(address _address) public external onlyOwner {
         require(!whitelist[_address].isRegistered, "User already registered");
-        whitelist[_address] = Voter(true, false, 0);
+        whitelist[address].isregistered=true;
         emit VoterRegistered(_address);
     }
 
-    function ProposalsRegistrationStarted(string memory _proposal) public isWhiteList {
+    function ProposalsRegistration(string memory _proposal) public external isWhiteList {
         require(stateWorkflowStatus == WorkflowStatus.ProposalsRegistrationStarted, "Session is not active !");
         proposalArray.push(Proposal(_proposal, 0));
 
         emit ProposalRegistered(proposalArray.length - 1);
     }
 
-    function seeProposal() public view isWhiteList returns(Proposal[] memory) {
+    function seeProposal() public external view isWhiteList returns(Proposal[] memory) {
         return proposalArray;
     }
 
-    function VotingSessionStarted(uint _idProposal) public isWhiteList {
+    function VotingSession(uint _idProposal) public external isWhiteList {
         require(stateWorkflowStatus == WorkflowStatus.VotingSessionStarted, "Session is not active !");
         require(whitelist[msg.sender].hasVoted == false, "You can't vote 2 times !");
         
@@ -83,7 +83,8 @@ contract Voting is Ownable {
     }
 
 
-    function getWinner() public view returns(uint) {
+    function getWinner() public external view returns(uint) {
+        require(stateWorkflowStatus == WorkflowStatus.VotesTallied, "Voting not yet closed !");
         uint winner;
         for (uint compteur=0; compteur < proposalArray.length; compteur ++) {
             if (proposalArray[compteur].voteCount > proposalArray[winner].voteCount) {
